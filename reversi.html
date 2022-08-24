@@ -1,0 +1,973 @@
+<html>
+    <head>
+        <style>
+            body {
+                font-family: 'Times New Roman', Times, serif;
+            }
+
+            .coin {
+                background-color: transparent;
+                width: 30px;
+                height: 30px;
+                transform: rotate3d(-1,1,0,0deg);
+                display: none;
+            }
+
+            .coin-inner {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                transform: rotate3d(-1,1,0,0deg);
+                text-align: center;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+            }
+
+            .coin-black, .coin-white {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                border-radius: 50%;
+            }
+
+            .coin-black {
+                background-image: linear-gradient(to bottom left,black 65%,white);
+            }
+
+            .coin-white {
+                background-image: linear-gradient(to bottom left,white 65%,black);
+            }
+            .square{
+                width: 30px;
+                height: 30px;
+                background-color: #009320;
+                display: inline-block;
+                margin: -1px;
+                border: 1px solid black;
+                padding: 10px;
+            }
+            .square:hover{
+                cursor: pointer;
+            }
+            #head{
+                text-align: center;
+            }
+            #main{
+                display: block;
+                float: left;
+                overflow: hidden;
+                padding: 1px;
+                border: 10px solid #808080;
+                background-color: #808080;
+            }
+        </style>
+        <script>
+            var count=1;
+            var a=[];
+            var c=[];
+            var bool=[];
+            var score=[];
+            for(let i=0;i<64;i++){
+                a.push(".");
+                c.push(0);
+                bool.push(true)
+            }
+            a[27]=1;
+            a[28]=0;
+            a[35]=0;
+            a[36]=1;
+            bool[27]=false;
+            bool[28]=false;
+            bool[35]=false;
+            bool[36]=false;
+            for(i=0;i<8;i++){
+                console.log(a[8*i+0],a[8*i+1],a[8*i+2],a[8*i+3],a[8*i+4],a[8*i+5],a[8*i+6],a[8*i+7])
+            }
+
+            function main(x){
+                if(bool[x]){
+                    if(checkforlegalmoves(count%2,(count+1)%2)){
+                        if(validornot(Math.trunc(x/8),x%8,count%2,(count+1)%2)){
+                        console.log(count);
+                            if(count%2==1){
+                                document.getElementsByClassName("coin")[x].style.display="block";
+                                document.getElementsByClassName("coin-black")[x].style.transform="rotate3d(-1,1,0,0deg)";
+                                document.getElementsByClassName("coin-white")[x].style.transform="rotate3d(-1,1,0,-180deg)";
+                                bool[x]=false;
+                                a[x]=1;
+                                turn(Math.trunc(x/8),x%8,count%2,(count+1)%2);
+                                document.getElementById("head").innerHTML="White's turn";
+                                scores=counter();
+                                document.getElementsByClassName("score")[0].innerHTML="Black: "+scores[0];
+                                document.getElementsByClassName("score")[1].innerHTML="White: "+scores[1];
+                                count++;
+                                for(i=0;i<8;i++){
+                                    console.log(a[8*i+0],a[8*i+1],a[8*i+2],a[8*i+3],a[8*i+4],a[8*i+5],a[8*i+6],a[8*i+7])
+                                }
+                                
+                            }
+                            else{
+                                document.getElementsByClassName("coin")[x].style.display="block";
+                                document.getElementsByClassName("coin-black")[x].style.transform="rotate3d(-1,1,0,-180deg)";
+                                document.getElementsByClassName("coin-white")[x].style.transform="rotate3d(-1,1,0,0deg)";
+                                bool[x]=false;
+                                a[x]=0;
+                                turn(Math.trunc(x/8),x%8,count%2,(count+1)%2);
+                                document.getElementById("head").innerHTML="Black's turn";
+                                scores=counter();
+                                document.getElementsByClassName("score")[0].innerHTML="Black: "+scores[0];
+                                document.getElementsByClassName("score")[1].innerHTML="White: "+scores[1];
+                                count++;
+                                for(i=0;i<8;i++){
+                                    console.log(a[8*i+0],a[8*i+1],a[8*i+2],a[8*i+3],a[8*i+4],a[8*i+5],a[8*i+6],a[8*i+7])
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        if(count%2==1){
+                            document.getElementById("head").innerHTML="White's turn";
+                        }
+                        else{
+                            document.getElementById("head").innerHTML="Black's turn";
+                        }
+                        count++;
+                    }
+                } 
+                if(!(checkforlegalmoves(1,0) && checkforlegalmoves(0,1)) || scores[0]+scores[1]==64){
+                    if(scores[1]>scores[0]){
+                        document.getElementById("head").innerHTML="White wins!!!";
+                    }
+                    else if(scores[0]>scores[1]){
+                        document.getElementById("head").innerHTML="Black wins!!!";
+                    }
+                    else{
+                        document.getElementById("head").innerHTML="It's a draw!!!";
+                    }
+                }  
+                
+            }
+
+            function counter(){
+                var b=0;
+                var w=0;
+                for(i=0;i<64;i++){
+                    if(a[i]==1){
+                        b++;
+                    }
+                    else if(a[i]==0){
+                        w++;
+                    }
+                }
+                return [b,w];
+            }
+
+
+
+            function swap(x){
+
+                if(c[x]%2==0){
+                    document.getElementsByClassName("coin-inner")[x].style.transform="rotate3d(-1,1,0,-180deg)";
+                    document.getElementsByClassName("coin")[x].style.transform="rotate3d(-1,1,0,-180deg)";
+                    c[x]++;
+                }
+                else{
+                    document.getElementsByClassName("coin-inner")[x].style.transform="rotate3d(-1,1,0,0deg)";
+                    document.getElementsByClassName("coin")[x].style.transform="rotate3d(-1,1,0,0deg)";
+                    c[x]++;
+                }
+            }
+
+
+
+            function checkforlegalmoves(x,y){
+                for(let i=0;i<8;i++){
+                    for(let j=0;j<8;j++){
+                        if (a[8*i+j]==x){
+                            if (j+1<=7){
+                                if (a[8*i+j+1]==y){
+                                    k=2;
+                                    while (j+k<=7){
+                                        if (a[8*i+j+k]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*i+j+k]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+                            if (i+1<=7){
+                                if (a[8*(i+1)+j]==y){
+                                    k=2;
+                                    while (i+k<=7){
+                                        if (a[8*(i+k)+j]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*(i+k)+j]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+                            if (j-1>=0){
+                                if (a[8*i+j-1]==y){
+                                    k=2;
+                                    while (j-k>=0){
+                                        if (a[8*i+j-k]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*i+j-k]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+                            if (i-1>=0){
+                                if (a[8*(i-1)+j]==y){
+                                    k=2;
+                                    while (i-k>=0){
+                                        if (a[8*(i-k)+j]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*(i-k)+j]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+
+                                    
+                            if (j+1<=7 && i+1<=7){
+                                if (a[8*(i+1)+j+1]==y){
+                                    k=2;
+                                    while (i+k<=7 && j+k<=7){
+                                        if (a[8*(i+k)+j+k]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*(i+k)+j+k]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+                            if (j-1>=0 && i+1<=7){
+                                if (a[8*(i+1)+j-1]==y){
+                                    k=2;
+                                    while (i+k<=7 && j-k>=0){
+                                        if (a[8*(i+k)+j-k]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*(i+k)+j-k]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+
+                            if (j+1<=7 && i-1>=0){
+                                if (a[8*(i-1)+j+1]==y){
+                                    k=2;
+                                    while (i-k>=0 && j+k<=7){
+                                        if (a[8*(i-k)+j+k]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*(i-k)+j+k]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+                            if (j-1>=0 && i-1>=0){
+                                if (a[8*(i-1)+j-1]==y){
+                                    k=2;
+                                    while (i-k>=0 && j-k>=0){
+                                        if (a[8*(i-k)+j-k]=="."){
+                                            return true;
+                                        }
+                                        else if (a[8*(i-k)+j-k]==x){
+                                            break;
+                                        }
+                                        k+=1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            function validornot(x,y,k,l){
+                if (y+1<=7){
+                    if (a[8*(x)+y+1]==l){
+                        i=2;
+                        while (y+i<=7){
+                            if (a[8*(x)+y+i]==k){
+                                return true;
+                            }
+                            else if (a[8*(x)+y+i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (y-1>=0){
+                    if (a[8*(x)+y-1]==l){
+                        i=2;
+                        while (y-i>=0){
+                            if (a[8*(x)+y-i]==k){
+                                return true;
+                            }
+                            else if (a[8*(x)+y-i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (x+1<=7){
+                    if (a[8*(x+1)+y]==l){
+                        i=2;
+                        while (x+i<=7){
+                            if (a[8*(x+i)+y]==k){
+                                return true;
+                            }
+                            else if (a[8*(x+i)+y]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (x-1>=0){
+                    if (a[8*(x-1)+y]==l){
+                        i=2;
+                        while (x-i>=0){
+                            if (a[8*(x-i)+y]==k){
+                                return true;
+                            }
+                            else if (a[8*(x-i)+y]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                
+                
+                if (y+1<=7 && x+1<=7){
+                    if (a[8*(x+1)+y+1]==l){
+                        i=2;
+                        while (y+i<=7 && x+i<=7){
+                            if (a[8*(x+i)+y+i]==k){
+                                return true;
+                            }
+                            else if (a[8*(x+i)+y+i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (y-1>=0 && x+1<=7){
+                    if (a[8*(x+1)+y-1]==l){
+                        i=2;
+                        while (y-i>=0 && x+i<=7){
+                            if (a[8*(x+i)+y-i]==k){
+                                return true;
+                            }
+                            else if (a[8*(x+i)+y-i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (y+1<=7 && x-1>=0){
+                    if (a[8*(x-1)+y+1]==l){
+                        i=2;
+                        while (y+i<=7 && x-i>=0){
+                            if (a[8*(x-i)+y+i]==k){
+                                return true;
+                            }
+                            else if (a[8*(x-i)+y+i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (y-1>=0 && x-1>=0){
+                    if (a[8*(x-1)+y-1]==l){
+                        i=2;
+                        while (y-i>=0 && x-i>=0){
+                            if (a[8*(x-i)+y-i]==k){
+                                return true;
+                            }
+                            else if (a[8*(x-i)+y-i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                return false;
+            }
+
+
+
+
+            function turn(x,y,k,l){
+                li=[-100,-100];
+                if (y+1<=7){
+                    if (a[8*x+y+1]==l){
+                        i=2;
+                        while (y+i<=7){
+                            if (a[8*x+y+i]==k){
+                                li[0]=x;
+                                li[1]=y+i;
+                                break;
+                            }
+                            else if (a[8*x+y+i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (y+i!=li[1]){
+                        a[8*x+y+i]=k;
+                        swap(8*x+y+i);
+                        i+=1;
+                    }
+                }
+                    
+                li=[-100,-100];
+                if (y-1>=0){
+                    if (a[8*x+y-1]==l){
+                        i=2;
+                        while (y-i>=0){
+                            if (a[8*x+y-i]==k){
+                                li[0]=x;
+                                li[1]=y-i;
+                                break;
+                            }
+                            else if (a[8*x+y-i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (y-i!=li[1]){
+                        a[8*x+y-i]=k;
+                        swap(8*x+y-i);
+                        i+=1;
+                    }
+                }
+
+                li=[-100,-100];
+                if (x+1<=7){
+                    if (a[8*(x+1)+y]==l){
+                        i=2;
+                        while (x+i<=7){
+                            if (a[8*(x+i)+y]==k){
+                                li[0]=x+i;
+                                li[1]=y;
+                                break;
+                            }
+                            else if (a[8*(x+i)+y]=="."){
+                                break;
+                            }
+                            i+=1
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (x+i!=li[0]){
+                        a[8*(x+i)+y]=k;
+                        swap(8*(x+i)+y);
+                        i+=1;
+                    }
+                }
+
+                li=[-100,-100];
+                if (x-1>=0){
+                    if (a[8*(x-1)+y]==l){
+                        i=2;
+                        while (x-i>=0){
+                            if (a[8*(x-i)+y]==k){
+                                li[0]=x-i;
+                                li[1]=y;
+                                break;
+                            }
+                            else if (a[8*(x-i)+y]=="."){
+                                break;
+                            }
+                            i+=1
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (x-i!=li[0]){
+                        a[8*(x-i)+y]=k;
+                        swap(8*(x-i)+y);
+                        i+=1;
+                    }
+                }
+                    
+
+                li=[-100,-100];
+                if (y+1<=7 && x+1<=7){
+                    if (a[8*(x+1)+y+1]==l){
+                        i=2;
+                        while (y+i<=7 && x+i<=7){
+                            if (a[8*(x+i)+y+i]==k){
+                                li[0]=x+i;
+                                li[1]=y+i;
+                                break;
+                            }
+                            else if (a[8*(x+i)+y+i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (y+i!=li[1]){
+                        a[8*(x+i)+y+i]=k;
+                        swap(8*(x+i)+y+i);
+                        i+=1;
+                    }
+                }
+
+                li=[-100,-100];
+                if (y-1>=0 && x+1<=7){
+                    if (a[8*(x+1)+y-1]==l){
+                        i=2;
+                        while (y-i>=0 && x+i<=7){
+                            if (a[8*(x+i)+y-i]==k){
+                                li[0]=x+i;
+                                li[1]=y-i;
+                                break;
+                            }
+                            else if (a[8*(x+i)+y-i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (y-i!=li[1]){
+                        a[8*(x+i)+y-i]=k;
+                        swap(8*(x+i)+y-i);
+                        i+=1;
+                    }
+                }
+
+                li=[-100,-100];
+                if (y-1>=0 && x-1>=0){
+                    if (a[8*(x-1)+y-1]==l){
+                        i=2;
+                        while (y-i>=0 && x-i>=0){
+                            if (a[8*(x-i)+y-i]==k){
+                                li[0]=x-i;
+                                li[1]=y-i;
+                                break;
+                            }
+                            else if (a[8*(x-i)+y-i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (y-i!=li[1]){
+                        a[8*(x-i)+y-i]=k;
+                        swap(8*(x-i)+y-i);
+                        i+=1;
+                    }
+                }
+                    
+                li=[-100,-100];
+                if (y+1<=7 && x-1>=0){
+                    if (a[8*(x-1)+y+1]==l){
+                        i=2;
+                        while (y+i<=7 && x-i>=0){
+                            if (a[8*(x-i)+y+i]==k){
+                                li[0]=x-i;
+                                li[1]=y+i;
+                                break;
+                            }
+                            else if (a[8*(x-i)+y+i]=="."){
+                                break;
+                            }
+                            i+=1;
+                        }
+                    }
+                }
+                if (li[0]!=-100 && li[1]!=-100){
+                    i=1;
+                    while (y+i!=li[1]){
+                        a[8*(x-i)+y+i]=k;
+                        swap(8*(x-i)+y+i);
+                        i+=1;
+                    }
+                }
+            }
+
+
+        </script>
+    </head>
+    <body>
+        <div id="main">
+            <div style="display: block;">
+                <div class="square" onclick="main(0)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(1)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(2)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(3)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(4)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(5)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(6)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(7)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+                <div class="square" onclick="main(8)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(9)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(10)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(11)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(12)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(13)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(14)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(15)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+                <div class="square" onclick="main(16)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(17)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(18)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(19)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(20)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(21)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(22)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(23)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+                <div class="square" onclick="main(24)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(25)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(26)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(27)">
+                    <div class="coin" style="display: block;">
+                        <div class="coin-inner"><div class="coin-black" style="transform: rotate3d(-1,1,0,0deg);"></div><div class="coin-white" style="transform: rotate3d(-1,1,0,-180deg);"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(28)">
+                    <div class="coin" style="display: block;">
+                        <div class="coin-inner"><div class="coin-black" style="transform: rotate3d(-1,1,0,-180deg);"></div><div class="coin-white" style="transform: rotate3d(-1,1,0,0deg);"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(29)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(30)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(31)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+                <div class="square" onclick="main(32)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(33)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(34)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(35)">
+                    <div class="coin" style="display: block;">
+                        <div class="coin-inner"><div class="coin-black" style="transform: rotate3d(-1,1,0,-180deg);"></div><div class="coin-white" style="transform: rotate3d(-1,1,0,0deg);"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(36)">
+                    <div class="coin" style="display: block;">
+                        <div class="coin-inner"><div class="coin-black" style="transform: rotate3d(-1,1,0,0deg);"></div><div class="coin-white" style="transform: rotate3d(-1,1,0,-180deg);"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(37)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(38)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(39)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+                <div class="square" onclick="main(40)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(41)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(42)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(43)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(44)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(45)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(46)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(47)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+                <div class="square" onclick="main(48)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(49)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(50)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(51)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(52)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(53)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(54)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(55)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+                <div class="square" onclick="main(56)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(57)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(58)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(59)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(60)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(61)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(62)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div>
+                <div class="square" onclick="main(63)">
+                    <div class="coin">
+                        <div class="coin-inner"><div class="coin-black"></div><div class="coin-white"></div></div>
+                    </div>
+                </div><br>
+            </div>
+            <h2 id="head">Black's turn</h2>
+            <h3 class="score" style="float: left;">Black: 2</h3>
+            <h3 class="score" style="float: right;">White: 2</h3>
+        </div>
+    </body>
+</html>
